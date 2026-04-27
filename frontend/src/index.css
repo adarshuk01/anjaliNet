@@ -21,6 +21,8 @@
   }
   .input {
     @apply w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent;
+    /* Prevent iOS Safari from zooming on input focus (requires font-size >= 16px on mobile) */
+    font-size: max(16px, 0.875rem);
   }
   .card {
     @apply bg-white rounded-xl shadow-sm border border-gray-100 p-5;

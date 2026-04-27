@@ -1,3 +1,13 @@
+export const openWhatsApp = (phone, message = '') => {
+  // Strip non-digits, add India country code if missing
+  const digits = (phone || '').replace(/\D/g, '')
+  if (!digits) return false
+  const num = digits.startsWith('91') && digits.length === 12 ? digits : `91${digits}`
+  const url = `https://wa.me/${num}${message ? `?text=${encodeURIComponent(message)}` : ''}`
+  window.open(url, '_blank')
+  return true
+}
+
 export const formatCurrency = (n) =>
   '₹' + Number(n || 0).toLocaleString('en-IN', { minimumFractionDigits: 0 })
 
@@ -13,14 +23,12 @@ export const getCurrentMonth = () => {
   return `${MONTH_NAMES[now.getMonth()]}-${String(now.getFullYear()).slice(2)}`
 }
 
-// Parse "APR-26" → { month: 3, year: 2026 }
 export const parseMonthStr = (str) => {
   if (!str) return { month: new Date().getMonth(), year: new Date().getFullYear() }
   const [m, y] = str.split('-')
   return { month: MONTH_NAMES.indexOf(m.toUpperCase()), year: 2000 + parseInt(y, 10) }
 }
 
-// Build "APR-26" from { month: 3, year: 2026 }
 export const buildMonthStr = (month, year) =>
   `${MONTH_NAMES[month]}-${String(year).slice(2)}`
 
