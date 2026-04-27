@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { useParams, useNavigate } from 'react-router-dom'
+import { useParams, useNavigate, useLocation } from 'react-router-dom'
 import { MdArrowBack, MdEdit, MdPhone, MdWhatsapp, MdCalendarToday, MdWifi, MdLocationOn, MdReceipt, MdAdd } from 'react-icons/md'
 import api from '../utils/api'
 import { formatCurrency, formatDate, getRowClass, getPaymentBadgeClass, openWhatsApp } from '../utils/helpers'
@@ -16,6 +16,7 @@ const WaIcon = () => (
 export default function CustomerProfile() {
   const { id } = useParams()
   const navigate = useNavigate()
+  const location = useLocation()
   const [customer, setCustomer] = useState(null)
   const [billing, setBilling] = useState([])
   const [stats, setStats] = useState({})
@@ -90,7 +91,10 @@ export default function CustomerProfile() {
   return (
     <div>
       <div className="flex items-center gap-3 mb-6">
-        <button onClick={() => navigate('/customers')} className="p-2 hover:bg-gray-100 rounded-lg text-gray-500">
+        <button
+          onClick={() => navigate(location.state?.from || '/customers')}
+          className="p-2 hover:bg-gray-100 rounded-lg text-gray-500"
+        >
           <MdArrowBack size={20} />
         </button>
         <div>

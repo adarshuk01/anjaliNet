@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react'
+import { useSearchParams, useNavigate } from 'react-router-dom'
 import { MdAdd, MdEdit, MdDelete, MdSearch, MdCheckCircle, MdReceiptLong, MdClose, MdUploadFile } from 'react-icons/md'
 import api from '../utils/api'
 import { formatCurrency, formatDate, getCurrentMonth, getRowClass, getPaymentBadgeClass } from '../utils/helpers'
@@ -8,7 +9,23 @@ import MonthPicker from '../components/ui/MonthPicker'
 import ImportModal from '../components/ui/ImportModal'
 import { useAuth } from '../context/AuthContext'
 
+function getPageNumbers(current, total) {
+  if (total <= 7) return Array.from({ length: total }, (_, i) => i + 1)
+  const pages = []
+  pages.push(1)
+  if (current > 4) pages.push('...')
+  for (let i = Math.max(2, current - 2); i <= Math.min(total - 1, current + 2); i++) {
+    pages.push(i)
+  }
+  if (current < total - 3) pages.push('...')
+  pages.push(total)
+  return pages
+}
+
 export default function Billing() {
+  const [searchParams, setSearchParams] = useSearchParams()
+  const navigate = useNavigate()
+
   const [records, setRecords] = useState([])
   const [summary, setSummary] = useState({})
   const [total, setTotal] = useState(0)
@@ -17,7 +34,7 @@ export default function Billing() {
   const [loading, setLoading] = useState(true)
   const [month, setMonth] = useState(getCurrentMonth())
   const [search, setSearch] = useState('')
-  const [statusFilter, setStatusFilter] = useState('')
+  const [statusFilter, setStatusFilter] = useState(() => searchParams.get('status') || '')
   const [payTypeFilter, setPayTypeFilter] = useState('')
   const [showForm, setShowForm] = useState(false)
   const [editRecord, setEditRecord] = useState(null)
@@ -25,6 +42,12 @@ export default function Billing() {
   const [showImport, setShowImport] = useState(false)
   const [toast, setToast] = useState(null)
   const { isAgent, isAdmin } = useAuth()
+
+  useEffect(() => {
+    const params = {}
+    if (statusFilter) params.status = statusFilter
+    setSearchParams(params, { replace: true })
+  }, [statusFilter])
 
   const fetchRecords = useCallback(async () => {
     setLoading(true)
@@ -112,7 +135,6 @@ export default function Billing() {
       {/* Month nav + filters */}
       <div className="card mb-4">
         <div className="flex flex-col lg:flex-row gap-3">
-          {/* Month picker — dynamic month + year selects */}
           <MonthPicker value={month} onChange={(m) => { setMonth(m); setPage(1) }} />
 
           <div className="flex flex-1 flex-wrap gap-2">
@@ -176,7 +198,10 @@ export default function Billing() {
                 <tr><td colSpan={12}><EmptyState icon={MdReceiptLong} title="No billing records" description={`No records for ${month}`} /></td></tr>
               ) : (
                 records.map(r => (
-                  <tr key={r._id} className={`${getRowClass(r.balance, r.amountPaid)} hover:brightness-95`}>
+                  <tr
+                    key={r._id}
+                    className={`${getRowClass(r.balance, r.amountPaid)} hover:brightness-95 cursor-pointer`}
+onClick={() => r.customerId?._id && navigate(`/customers/${r.customerId._id}`, { state: { from: '/billing' } })}                  >
                     <td className="px-3 py-2 mono whitespace-nowrap">{formatDate(r.billingDate)}</td>
                     <td className="px-3 py-2">
                       <div>
@@ -202,7 +227,7 @@ export default function Billing() {
                       </span>
                     </td>
                     <td className="px-3 py-2">
-                      <div className="flex items-center gap-1">
+                      <div className="flex items-center gap-1" onClick={e => e.stopPropagation()}>
                         {isAgent && r.balance > 0 && (
                           <button title="Mark Paid" onClick={() => handleMarkPaid(r)}
                             className="p-1 hover:bg-green-50 rounded text-gray-400 hover:text-green-600">
@@ -231,15 +256,42 @@ export default function Billing() {
         </div>
 
         {pages > 1 && (
-          <div className="px-4 py-3 border-t border-gray-200 flex items-center justify-between text-xs text-gray-500">
-            <span>Showing {(page - 1) * 50 + 1}–{Math.min(page * 50, total)} of {total}</span>
-            <div className="flex gap-1">
-              <button onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page === 1} className="px-2 py-1 rounded hover:bg-gray-100 disabled:opacity-40">Prev</button>
-              {[...Array(Math.min(pages, 5))].map((_, i) => (
-                <button key={i} onClick={() => setPage(i + 1)}
-                  className={`w-7 h-7 rounded text-xs ${page === i + 1 ? 'bg-brand-800 text-white' : 'hover:bg-gray-100'}`}>{i + 1}</button>
-              ))}
-              <button onClick={() => setPage(p => Math.min(pages, p + 1))} disabled={page === pages} className="px-2 py-1 rounded hover:bg-gray-100 disabled:opacity-40">Next</button>
+          <div className="px-4 py-3 border-t border-gray-200 flex items-center justify-between gap-2 text-xs text-gray-500 flex-wrap">
+            <span className="whitespace-nowrap">
+              Showing {(page - 1) * 50 + 1}–{Math.min(page * 50, total)} of {total}
+            </span>
+            <div className="flex items-center gap-1 flex-wrap">
+              <button
+                onClick={() => setPage(p => Math.max(1, p - 1))}
+                disabled={page === 1}
+                className="px-2 py-1 rounded hover:bg-gray-100 disabled:opacity-40"
+              >
+                Prev
+              </button>
+
+              {getPageNumbers(page, pages).map((p, i) =>
+                p === '...'
+                  ? <span key={`ellipsis-${i}`} className="w-7 text-center text-gray-400 select-none">…</span>
+                  : <button
+                      key={p}
+                      onClick={() => setPage(p)}
+                      className={`w-7 h-7 rounded text-xs font-medium transition-colors ${
+                        page === p
+                          ? 'bg-brand-800 text-white'
+                          : 'hover:bg-gray-100 text-gray-600'
+                      }`}
+                    >
+                      {p}
+                    </button>
+              )}
+
+              <button
+                onClick={() => setPage(p => Math.min(pages, p + 1))}
+                disabled={page === pages}
+                className="px-2 py-1 rounded hover:bg-gray-100 disabled:opacity-40"
+              >
+                Next
+              </button>
             </div>
           </div>
         )}
@@ -261,7 +313,7 @@ export default function Billing() {
           onDone={() => { setShowImport(false); fetchRecords(); setToast({ message: 'Billing records imported!', type: 'success' }) }}
         />
       )}
-      {toast && <Toast {...toast} onClose={() => setToast(null)} />}}
+      {toast && <Toast {...toast} onClose={() => setToast(null)} />}
     </div>
   )
 }

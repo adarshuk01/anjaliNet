@@ -10,8 +10,11 @@ router.get('/', protect, async (req, res) => {
     const query = {};
     if (month) query.month = month;
     if (paymentType) query.paymentType = paymentType;
-    if (status === 'paid') query.balance = 0;
-    if (status === 'unpaid') query.balance = { $gt: 0 };
+
+    // FIX: unpaid must have amountPaid === 0, not just balance > 0
+    // (balance > 0 alone also matches partial payments)
+    if (status === 'paid')    { query.balance = 0; }
+    if (status === 'unpaid')  { query.amountPaid = 0; query.balance = { $gt: 0 }; }
     if (status === 'partial') { query.amountPaid = { $gt: 0 }; query.balance = { $gt: 0 }; }
 
     if (search) {
