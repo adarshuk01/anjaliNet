@@ -24,7 +24,7 @@ export function Modal({ title, children, onClose, size = 'md' }) {
           relative bg-white w-full ${sizeClass}
           rounded-t-2xl sm:rounded-xl
           shadow-2xl flex flex-col
-          max-h-[92vh] sm:max-h-[90vh]
+         max-h-[75vh] sm:max-h-[90vh]
           animate-sheet-up sm:animate-fade-scale
         `}
       >
