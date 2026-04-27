@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { MdAdd, MdSearch, MdEdit, MdDelete, MdPeople, MdClose, MdUploadFile } from 'react-icons/md'
 import api from '../utils/api'
@@ -15,6 +15,7 @@ export default function Customers() {
   const [pages, setPages] = useState(1)
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState('')
+  const [inputValue, setInputValue] = useState('')
   const [statusFilter, setStatusFilter] = useState('')
   const [showForm, setShowForm] = useState(false)
   const [editCustomer, setEditCustomer] = useState(null)
@@ -23,6 +24,8 @@ export default function Customers() {
   const [toast, setToast] = useState(null)
   const { isAdmin, isAgent } = useAuth()
   const navigate = useNavigate()
+
+  const debounceRef = useRef(null)
 
   const fetchCustomers = useCallback(async () => {
     setLoading(true)
@@ -43,7 +46,15 @@ export default function Customers() {
 
   useEffect(() => { fetchCustomers() }, [fetchCustomers])
 
-  const handleSearch = (e) => { setSearch(e.target.value); setPage(1) }
+  const handleSearch = (e) => {
+    const val = e.target.value
+    setInputValue(val)
+    clearTimeout(debounceRef.current)
+    debounceRef.current = setTimeout(() => {
+      setSearch(val)
+      setPage(1)
+    }, 300)
+  }
 
   const handleSave = async (data) => {
     try {
@@ -98,7 +109,7 @@ export default function Customers() {
           <div className="relative flex-1">
             <MdSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
             <input className="input pl-9" placeholder="Search name, ID, mobile, CRF..."
-              value={search} onChange={handleSearch} />
+              value={inputValue} onChange={handleSearch} />
           </div>
           <div className="flex gap-2">
             <select className="input w-36" value={statusFilter} onChange={e => { setStatusFilter(e.target.value); setPage(1) }}>
@@ -106,8 +117,8 @@ export default function Customers() {
               <option value="active">Active</option>
               <option value="inactive">Inactive</option>
             </select>
-            {(search || statusFilter) && (
-              <button className="btn-secondary flex items-center gap-1" onClick={() => { setSearch(''); setStatusFilter(''); setPage(1) }}>
+            {(inputValue || statusFilter) && (
+              <button className="btn-secondary flex items-center gap-1" onClick={() => { setSearch(''); setInputValue(''); setStatusFilter(''); setPage(1) }}>
                 <MdClose size={16} /> Clear
               </button>
             )}

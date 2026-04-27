@@ -4,12 +4,16 @@ import Sidebar from './Sidebar'
 import Header from './Header'
 import QuickPay from '../ui/Quickpay'
 import { useAuth } from '../../context/AuthContext'
+import { QuickPayProvider, useQuickPay } from '../../context/QuickPayContext'
 import { MdPayments } from 'react-icons/md'
 
-export default function Layout() {
+function LayoutInner() {
   const [sidebarOpen, setSidebarOpen] = useState(false)
-  const [showQuickPay, setShowQuickPay] = useState(false)
   const { isAgent } = useAuth()
+  const { quickPayCustomer, openQuickPay, closeQuickPay } = useQuickPay()
+
+  const isOpen = quickPayCustomer !== null
+  const initialCustomer = isOpen && quickPayCustomer !== 'search' ? quickPayCustomer : null
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -24,7 +28,7 @@ export default function Layout() {
       {/* Quick Pay FAB — visible on every page for agents */}
       {isAgent && (
         <button
-          onClick={() => setShowQuickPay(true)}
+          onClick={() => openQuickPay()}
           className="fixed bottom-16 right-6 z-40 flex items-center gap-2 bg-brand-800 hover:bg-brand-700 active:scale-95 text-white px-5 py-3.5 rounded-full shadow-lg text-sm font-semibold transition-all"
         >
           <MdPayments size={20} />
@@ -32,12 +36,21 @@ export default function Layout() {
         </button>
       )}
 
-      {showQuickPay && (
+      {isOpen && (
         <QuickPay
-          onClose={() => setShowQuickPay(false)}
-          onDone={() => setShowQuickPay(false)}
+          initialCustomer={initialCustomer}
+          onClose={closeQuickPay}
+          onDone={closeQuickPay}
         />
       )}
     </div>
+  )
+}
+
+export default function Layout() {
+  return (
+    <QuickPayProvider>
+      <LayoutInner />
+    </QuickPayProvider>
   )
 }

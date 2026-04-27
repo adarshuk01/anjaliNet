@@ -5,12 +5,12 @@ import { formatCurrency, formatDate, openWhatsApp } from '../../utils/helpers'
 
 const PAYMENT_TYPES = ['Cash', 'SBI', 'Online', 'Mini', 'Vishnu', 'Premji', 'Bill', 'S', 'Other']
 
-export default function QuickPay({ onClose, onDone }) {
-  const [step, setStep] = useState('search')
+export default function QuickPay({ onClose, onDone, initialCustomer = null }) {
+  const [step, setStep] = useState(initialCustomer ? 'bills' : 'search')
   const [query, setQuery] = useState('')
   const [searching, setSearching] = useState(false)
   const [results, setResults] = useState([])
-  const [customer, setCustomer] = useState(null)
+  const [customer, setCustomer] = useState(initialCustomer)
   const [bills, setBills] = useState([])
   const [loadingBills, setLoadingBills] = useState(false)
   const [selectedBill, setSelectedBill] = useState(null)
@@ -25,31 +25,16 @@ export default function QuickPay({ onClose, onDone }) {
   const searchRef = useRef(null)
   const debounceRef = useRef(null)
 
-  useEffect(() => { searchRef.current?.focus() }, [])
-
-  const doSearch = useCallback(async (q) => {
-    if (!q.trim()) { setResults([]); return }
-    setSearching(true)
-    try {
-      const { data } = await api.get(`/customers?search=${encodeURIComponent(q)}&limit=8`)
-      setResults(data.customers || [])
-    } catch {
-      setResults([])
-    } finally {
-      setSearching(false)
+  useEffect(() => {
+    if (initialCustomer) {
+      // Auto-load bills for the pre-selected customer
+      loadBillsForCustomer(initialCustomer)
+    } else {
+      searchRef.current?.focus()
     }
   }, [])
 
-  const handleQueryChange = (e) => {
-    const q = e.target.value
-    setQuery(q)
-    clearTimeout(debounceRef.current)
-    debounceRef.current = setTimeout(() => doSearch(q), 280)
-  }
-
-  const selectCustomer = async (c) => {
-    setCustomer(c)
-    setStep('bills')
+  const loadBillsForCustomer = async (c) => {
     setLoadingBills(true)
     setBills([])
     setPaid(null)
@@ -78,6 +63,32 @@ export default function QuickPay({ onClose, onDone }) {
     } finally {
       setLoadingBills(false)
     }
+  }
+
+  const doSearch = useCallback(async (q) => {
+    if (!q.trim()) { setResults([]); return }
+    setSearching(true)
+    try {
+      const { data } = await api.get(`/customers?search=${encodeURIComponent(q)}&limit=8`)
+      setResults(data.customers || [])
+    } catch {
+      setResults([])
+    } finally {
+      setSearching(false)
+    }
+  }, [])
+
+  const handleQueryChange = (e) => {
+    const q = e.target.value
+    setQuery(q)
+    clearTimeout(debounceRef.current)
+    debounceRef.current = setTimeout(() => doSearch(q), 280)
+  }
+
+  const selectCustomer = async (c) => {
+    setCustomer(c)
+    setStep('bills')
+    await loadBillsForCustomer(c)
   }
 
   const openPay = (bill) => {
@@ -152,7 +163,7 @@ export default function QuickPay({ onClose, onDone }) {
         <div className="flex items-center gap-3 px-4 pt-4 pb-3 border-b border-gray-100">
           {step !== 'search' && (
             <button
-              onClick={() => step === 'pay' ? setStep('bills') : (setStep('search'), setCustomer(null), setBills([]))}
+              onClick={() => step === 'pay' ? setStep('bills') : (initialCustomer ? onClose() : (setStep('search'), setCustomer(null), setBills([])))}
               className="p-1.5 hover:bg-gray-100 rounded-lg text-gray-500"
             >
               <MdArrowBack size={20} />

@@ -1,11 +1,12 @@
 import { useState, useEffect } from 'react'
 import { useParams, useNavigate, useLocation } from 'react-router-dom'
-import { MdArrowBack, MdEdit, MdPhone, MdWhatsapp, MdCalendarToday, MdWifi, MdLocationOn, MdReceipt, MdAdd } from 'react-icons/md'
+import { MdArrowBack, MdEdit, MdPhone, MdWhatsapp, MdCalendarToday, MdWifi, MdLocationOn, MdReceipt, MdAdd, MdPayments } from 'react-icons/md'
 import api from '../utils/api'
 import { formatCurrency, formatDate, getRowClass, getPaymentBadgeClass, openWhatsApp } from '../utils/helpers'
 import { Modal, Toast, Spinner, PageHeader } from '../components/ui'
 import CustomerForm from '../components/ui/CustomerForm'
 import BillingForm from '../components/ui/BillingForm'
+import { useQuickPay } from '../context/QuickPayContext'
 
 const WaIcon = () => (
   <svg viewBox="0 0 24 24" className="w-4 h-4 fill-current" xmlns="http://www.w3.org/2000/svg">
@@ -17,6 +18,7 @@ export default function CustomerProfile() {
   const { id } = useParams()
   const navigate = useNavigate()
   const location = useLocation()
+  const { openQuickPay } = useQuickPay()
   const [customer, setCustomer] = useState(null)
   const [billing, setBilling] = useState([])
   const [stats, setStats] = useState({})
@@ -174,7 +176,13 @@ export default function CustomerProfile() {
 
           {/* Actions */}
           <div className="card space-y-2">
-            <button className="btn-primary w-full flex items-center justify-center gap-2" onClick={() => setShowPayment(true)}>
+            <button
+              className="btn-primary w-full flex items-center justify-center gap-2"
+              onClick={() => openQuickPay(customer)}
+            >
+              <MdPayments size={18} /> Quick Pay
+            </button>
+            <button className="btn-secondary w-full flex items-center justify-center gap-2" onClick={() => setShowPayment(true)}>
               <MdAdd size={18} /> Record Payment
             </button>
             <button className="btn-secondary w-full flex items-center justify-center gap-2" onClick={() => setShowEdit(true)}>
