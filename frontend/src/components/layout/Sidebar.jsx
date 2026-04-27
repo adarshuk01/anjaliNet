@@ -142,7 +142,7 @@ export function MobileBottomBar({ onClose }) {
               return (
                 <>
                   <div className={`p-1 rounded-lg transition-all ${isActive ? 'bg-white/15' : ''}`}>
-                    <Icon size={22} className={isActive ? 'text-white' : 'text-gray-400'} />
+                    <Icon size={28} className={isActive ? 'text-white' : 'text-gray-400'} />
                   </div>
                   <span className={`text-[10px] font-medium leading-tight truncate w-full text-center ${isActive ? 'text-white' : 'text-gray-400'}`}>
                     {label}
