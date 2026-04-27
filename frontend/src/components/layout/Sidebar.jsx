@@ -1,21 +1,27 @@
 import { NavLink, useNavigate } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
 import {
-  MdDashboard, MdPeople, MdReceiptLong, MdBarChart,
-  MdWifi, MdPerson, MdSettings, MdLogout, MdClose
+  MdDashboard, MdOutlineDashboard,
+  MdPeople, MdOutlinePeople,
+  MdReceiptLong, MdOutlineReceiptLong,
+  MdBarChart, MdOutlineBarChart,
+  MdWifi, MdOutlineWifi,
+  MdPerson, MdOutlinePerson,
+  MdSettings, MdOutlineSettings,
+  MdLogout, MdClose
 } from 'react-icons/md'
 
 const navItems = [
-  { to: '/', icon: MdDashboard, label: 'Dashboard', exact: true },
-  { to: '/customers', icon: MdPeople, label: 'Customers' },
-  { to: '/billing', icon: MdReceiptLong, label: 'Billing' },
-  { to: '/reports', icon: MdBarChart, label: 'Reports' },
-  { to: '/plans', icon: MdWifi, label: 'Plans' },
+  { to: '/', icon: MdDashboard, outlineIcon: MdOutlineDashboard, label: 'Dashboard', exact: true },
+  { to: '/customers', icon: MdPeople, outlineIcon: MdOutlinePeople, label: 'Customers' },
+  { to: '/billing', icon: MdReceiptLong, outlineIcon: MdOutlineReceiptLong, label: 'Billing' },
+  { to: '/reports', icon: MdBarChart, outlineIcon: MdOutlineBarChart, label: 'Reports' },
+  { to: '/plans', icon: MdWifi, outlineIcon: MdOutlineWifi, label: 'Plans' },
 ]
 
 const adminItems = [
-  { to: '/users', icon: MdPerson, label: 'Users' },
-  { to: '/settings', icon: MdSettings, label: 'Settings' },
+  { to: '/settings', icon: MdSettings, outlineIcon: MdOutlineSettings, label: 'Settings' },
+  { to: '/users', icon: MdPerson, outlineIcon: MdOutlinePerson, label: 'Users' },
 ]
 
 // Desktop sidebar — hidden on mobile
@@ -103,6 +109,8 @@ export default function Sidebar({ open, onClose }) {
 // Mobile bottom navigation bar
 export function MobileBottomBar({ onClose }) {
   const { isAdmin, logout } = useAuth()
+  console.log(isAdmin);
+  
   const navigate = useNavigate()
 
   const allItems = [
@@ -110,18 +118,18 @@ export function MobileBottomBar({ onClose }) {
     ...(isAdmin ? adminItems : []),
   ]
 
-  // Show at most 5 items on bottom bar; rest are accessible via desktop sidebar
-  const visibleItems = allItems.slice(0, 5)
+  // Show at most 6 items on bottom bar; rest are accessible via desktop sidebar
+  const visibleItems = allItems.slice(0, 6)
 
   const linkClass = ({ isActive }) =>
     `flex flex-col items-center justify-center gap-0.5 py-1 px-2 min-w-0 flex-1 transition-all ${
-      isActive ? 'text-brand-800' : 'text-gray-400'
+      isActive ? 'text-white' : 'text-gray-500'
     }`
 
   return (
-    <nav className="lg:hidden fixed bottom-0 left-0 right-0 z-30 bg-white border-t border-gray-200 safe-area-pb">
+    <nav className="lg:hidden fixed bottom-0 left-0 right-0 z-30 bg-brand-800 border-t border-white/10 safe-area-pb">
       <div className="flex items-stretch h-16">
-        {visibleItems.map(({ to, icon: Icon, label, exact }) => (
+        {visibleItems.map(({ to, icon: FilledIcon, outlineIcon: OutlineIcon, label, exact }) => (
           <NavLink
             key={to}
             to={to}
@@ -129,16 +137,19 @@ export function MobileBottomBar({ onClose }) {
             className={linkClass}
             onClick={onClose}
           >
-            {({ isActive }) => (
-              <>
-                <div className={`p-1 rounded-lg transition-all ${isActive ? 'bg-brand-50' : ''}`}>
-                  <Icon size={22} className={isActive ? 'text-brand-800' : 'text-gray-400'} />
-                </div>
-                <span className={`text-[10px] font-medium leading-tight truncate w-full text-center ${isActive ? 'text-brand-800' : 'text-gray-400'}`}>
-                  {label}
-                </span>
-              </>
-            )}
+            {({ isActive }) => {
+              const Icon = isActive ? FilledIcon : OutlineIcon
+              return (
+                <>
+                  <div className={`p-1 rounded-lg transition-all ${isActive ? 'bg-white/15' : ''}`}>
+                    <Icon size={22} className={isActive ? 'text-white' : 'text-gray-400'} />
+                  </div>
+                  <span className={`text-[10px] font-medium leading-tight truncate w-full text-center ${isActive ? 'text-white' : 'text-gray-400'}`}>
+                    {label}
+                  </span>
+                </>
+              )
+            }}
           </NavLink>
         ))}
       </div>
