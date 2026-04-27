@@ -157,7 +157,12 @@ export default function QuickPay({ onClose, onDone, initialCustomer = null }) {
     <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center">
       <div className="absolute inset-0 bg-black/50" onClick={onClose} />
 
-      <div className="relative w-full sm:max-w-md bg-white rounded-t-2xl sm:rounded-2xl shadow-2xl flex flex-col max-h-[92vh]">
+      <div className="relative w-full sm:max-w-md bg-white rounded-t-2xl sm:rounded-2xl shadow-2xl flex flex-col max-h-[92vh] animate-sheet-up sm:animate-fade-scale">
+
+        {/* Drag handle — mobile only */}
+        <div className="sm:hidden flex justify-center pt-3 pb-1">
+          <div className="w-10 h-1 bg-gray-300 rounded-full" />
+        </div>
 
         {/* Header */}
         <div className="flex items-center gap-3 px-4 pt-4 pb-3 border-b border-gray-100">

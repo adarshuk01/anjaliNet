@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Outlet } from 'react-router-dom'
-import Sidebar from './Sidebar'
+import Sidebar, { MobileBottomBar } from './Sidebar'
 import Header from './Header'
 import QuickPay from '../ui/Quickpay'
 import { useAuth } from '../../context/AuthContext'
@@ -17,19 +17,25 @@ function LayoutInner() {
 
   return (
     <div className="min-h-screen bg-gray-50">
+      {/* Desktop sidebar */}
       <Sidebar open={sidebarOpen} onClose={() => setSidebarOpen(false)} />
-      <div className="lg:ml-64 flex flex-col min-h-screen">
+
+      {/* Main content — add bottom padding on mobile for bottom bar */}
+      <div className="lg:ml-64 flex flex-col min-h-screen pb-16 lg:pb-0">
         <Header onMenuClick={() => setSidebarOpen(true)} />
         <main className="flex-1 p-4 lg:p-6">
           <Outlet />
         </main>
       </div>
 
-      {/* Quick Pay FAB — visible on every page for agents */}
+      {/* Mobile bottom nav bar */}
+      <MobileBottomBar onClose={() => setSidebarOpen(false)} />
+
+      {/* Quick Pay FAB — above bottom bar on mobile */}
       {isAgent && (
         <button
           onClick={() => openQuickPay()}
-          className="fixed bottom-16 right-6 z-40 flex items-center gap-2 bg-brand-800 hover:bg-brand-700 active:scale-95 text-white px-5 py-3.5 rounded-full shadow-lg text-sm font-semibold transition-all"
+          className="fixed bottom-20 right-4 lg:bottom-6 lg:right-6 z-40 flex items-center gap-2 bg-brand-800 hover:bg-brand-700 active:scale-95 text-white px-4 py-3 lg:px-5 lg:py-3.5 rounded-full shadow-lg text-sm font-semibold transition-all"
         >
           <MdPayments size={20} />
           <span className="hidden sm:inline">Quick Pay</span>

@@ -1,25 +1,46 @@
 import { useEffect } from 'react'
 import { MdClose, MdCheckCircle, MdError, MdWarning } from 'react-icons/md'
 
-// Modal
+// Modal — center on desktop, bottom sheet on mobile
 export function Modal({ title, children, onClose, size = 'md' }) {
   useEffect(() => {
     document.body.style.overflow = 'hidden'
     return () => { document.body.style.overflow = '' }
   }, [])
 
-  const sizeClass = { sm: 'max-w-md', md: 'max-w-lg', lg: 'max-w-2xl', xl: 'max-w-4xl' }[size]
+  const sizeClass = { sm: 'sm:max-w-md', md: 'sm:max-w-lg', lg: 'sm:max-w-2xl', xl: 'sm:max-w-4xl' }[size]
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-      <div className="absolute inset-0 bg-black/50" onClick={onClose} />
-      <div className={`relative bg-white rounded-xl shadow-xl w-full ${sizeClass} max-h-[90vh] flex flex-col`}>
-        <div className="flex items-center justify-between px-5 py-4 border-b border-gray-200">
+    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center">
+      {/* Backdrop */}
+      <div
+        className="absolute inset-0 bg-black/50"
+        onClick={onClose}
+      />
+
+      {/* Sheet — slides up on mobile, centered on desktop */}
+      <div
+        className={`
+          relative bg-white w-full ${sizeClass}
+          rounded-t-2xl sm:rounded-xl
+          shadow-2xl flex flex-col
+          max-h-[92vh] sm:max-h-[90vh]
+          animate-sheet-up sm:animate-fade-scale
+        `}
+      >
+        {/* Drag handle (mobile only) */}
+        <div className="sm:hidden flex justify-center pt-3 pb-1">
+          <div className="w-10 h-1 bg-gray-300 rounded-full" />
+        </div>
+
+        {/* Header */}
+        <div className="flex items-center justify-between px-5 py-3 sm:py-4 border-b border-gray-200">
           <h2 className="text-base font-semibold text-gray-900">{title}</h2>
-          <button onClick={onClose} className="text-gray-400 hover:text-gray-600 transition-colors">
+          <button onClick={onClose} className="text-gray-400 hover:text-gray-600 transition-colors p-1 rounded-lg hover:bg-gray-100">
             <MdClose size={20} />
           </button>
         </div>
+
         <div className="overflow-y-auto flex-1 p-5">{children}</div>
       </div>
     </div>
@@ -48,7 +69,7 @@ export function Toast({ message, type = 'success', onClose }) {
   const { bg, text, Icon, iconColor } = config[type]
 
   return (
-    <div className={`fixed bottom-5 right-5 z-[100] flex items-center gap-3 px-4 py-3 rounded-lg border shadow-lg ${bg} max-w-sm`}>
+    <div className={`fixed bottom-20 lg:bottom-5 right-5 z-[100] flex items-center gap-3 px-4 py-3 rounded-lg border shadow-lg ${bg} max-w-sm`}>
       <Icon className={iconColor} size={20} />
       <p className={`text-sm font-medium ${text}`}>{message}</p>
       <button onClick={onClose} className={`ml-2 ${text} opacity-60 hover:opacity-100`}><MdClose size={16} /></button>

@@ -217,8 +217,8 @@ export default function ImportModal({ mode, onClose, onDone }) {
   const title = mode === 'customers' ? 'Import Customers' : 'Import Billing Records'
 
   return (
-    <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-xl shadow-xl w-full max-w-xl max-h-[90vh] flex flex-col">
+    <div className="fixed inset-0 bg-black/40 flex items-end sm:items-center justify-center z-50 sm:p-4">
+      <div className="bg-white rounded-t-2xl sm:rounded-xl shadow-2xl w-full sm:max-w-xl max-h-[92vh] sm:max-h-[90vh] flex flex-col animate-sheet-up sm:animate-fade-scale"><div className="sm:hidden flex justify-center pt-3 pb-1 flex-shrink-0"><div className="w-10 h-1 bg-gray-300 rounded-full" /></div>
         {/* Header */}
         <div className="flex items-center justify-between px-5 py-4 border-b border-gray-200">
           <h2 className="text-base font-semibold text-gray-900">{title}</h2>

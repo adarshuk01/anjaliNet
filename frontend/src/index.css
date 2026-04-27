@@ -52,3 +52,25 @@
 ::-webkit-scrollbar-track { background: #f1f5f9; }
 ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
 ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+/* ── Bottom sheet animation ───────────────────────────── */
+@keyframes sheet-up {
+  from { transform: translateY(100%); }
+  to   { transform: translateY(0); }
+}
+@keyframes fade-scale {
+  from { opacity: 0; transform: scale(0.97) translateY(4px); }
+  to   { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+.animate-sheet-up {
+  animation: sheet-up 0.28s cubic-bezier(0.32, 0.72, 0, 1);
+}
+.animate-fade-scale {
+  animation: fade-scale 0.2s ease-out;
+}
+
+/* Safe area bottom padding for notched phones */
+.safe-area-pb {
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}

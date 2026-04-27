@@ -35,7 +35,8 @@ export default function Header({ onMenuClick }) {
 
   return (
     <header className="h-16 bg-white border-b border-gray-200 flex items-center px-4 gap-4 sticky top-0 z-10">
-      <button onClick={onMenuClick} className="lg:hidden text-gray-500 hover:text-gray-700">
+      {/* Hamburger only shown on lg+ as an optional desktop toggle — hidden on mobile (bottom bar handles nav) */}
+      <button onClick={onMenuClick} className="hidden lg:flex text-gray-500 hover:text-gray-700">
         <MdMenu size={24} />
       </button>
 
