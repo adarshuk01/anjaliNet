@@ -6,6 +6,7 @@ const api = axios.create({
     : '/api',
 })
 
+
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem('anjali_token')
   if (token) config.headers.Authorization = `Bearer ${token}`

@@ -92,12 +92,14 @@ router.post('/billing', protect, agentOrAdmin, async (req, res) => {
       if (!rec.month) { skipped++; continue; }
 
       try {
-        const balance = Math.max(
-          0,
-          (Number(rec.oldBalance) || 0) +
-          (Number(rec.amountBilled) || 0) -
-          (Number(rec.amountPaid) || 0)
-        );
+        // Fix — add cableRent:
+const balance = Math.max(
+  0,
+  (Number(rec.oldBalance) || 0) +
+  (Number(rec.amountBilled) || 0) +
+  (Number(rec.cableRent)   || 0) -
+  (Number(rec.amountPaid)  || 0)
+);
 
         // Auto bill number if missing
         let billNumber = rec.billNumber;

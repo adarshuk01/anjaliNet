@@ -49,8 +49,8 @@ router.get('/', protect, async (req, res) => {
 router.post('/', protect, agentOrAdmin, async (req, res) => {
   try {
     const data = { ...req.body, createdBy: req.user._id };
-    data.balance = (data.oldBalance || 0) + (data.amountBilled || 0) - (data.amountPaid || 0);
-    if (!data.billNumber) {
+data.balance = (data.oldBalance || 0) + (data.amountBilled || 0) + (data.cableRent || 0) - (data.amountPaid || 0); 
+   if (!data.billNumber) {
       const count = await Billing.countDocuments();
       data.billNumber = `AN${String(55000 + count + 1).padStart(5, '0')}`;
     }
@@ -87,7 +87,7 @@ router.get('/:id', protect, async (req, res) => {
 router.put('/:id', protect, agentOrAdmin, async (req, res) => {
   try {
     const data = { ...req.body };
-    data.balance = (data.oldBalance || 0) + (data.amountBilled || 0) - (data.amountPaid || 0);
+     data.balance = (data.oldBalance || 0) + (data.amountBilled || 0) + (data.cableRent || 0) - (data.amountPaid || 0);
     const record = await Billing.findByIdAndUpdate(req.params.id, data, { new: true })
       .populate('customerId', 'name userId mobile');
     if (!record) return res.status(404).json({ message: 'Record not found' });
@@ -106,7 +106,7 @@ router.post('/:id/pay', protect, agentOrAdmin, async (req, res) => {
     record.amountPaid = amountPaid || record.amountBilled + record.oldBalance;
     record.paymentType = paymentType || record.paymentType;
     record.paidDate = paidDate || new Date();
-    record.balance = record.oldBalance + record.amountBilled - record.amountPaid;
+    record.balance = record.oldBalance + record.amountBilled + (record.cableRent || 0) - record.amountPaid;
     await record.save();
     res.json(record);
   } catch (err) {

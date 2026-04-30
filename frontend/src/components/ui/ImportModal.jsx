@@ -152,7 +152,7 @@ export default function ImportModal({ mode, onClose, onDone }) {
           amountBilled,
           oldBalance,
           amountPaid,
-          balance: balance || Math.max(0, oldBalance + amountBilled - amountPaid),
+          balance: balance || Math.max(0, oldBalance + amountBilled + cableRent - amountPaid),
           paidDate: paidDate || undefined,
           billNumber: billNo && billNo !== '0' ? billNo : undefined,
           remarks: String(row['REMARK'] || '').trim() || undefined,
