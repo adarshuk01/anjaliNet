@@ -212,7 +212,7 @@ export default function CustomerProfile() {
               <table className="w-full text-sm">
                 <thead className="bg-gray-50 border-b border-gray-200">
                   <tr>
-                    {['Month','Plan','Billed','Paid','Balance','Pay Type','Bill No.','Status', ''].map(h => (
+                    {['Month','Plan','Cable ','Billed','Paid','Balance','Pay Type','Bill No.','Status', ''].map(h => (
                       <th key={h} className="px-3 py-2.5 text-left text-xs font-medium text-gray-500 uppercase whitespace-nowrap">{h}</th>
                     ))}
                   </tr>
@@ -224,6 +224,8 @@ export default function CustomerProfile() {
                     <tr key={r._id} className={getRowClass(r.balance, r.amountPaid)}>
                       <td className="px-3 py-2.5 mono font-medium text-xs">{r.month}</td>
                       <td className="px-3 py-2.5 text-xs">{r.plan ? <span className="bg-blue-50 text-blue-700 px-1.5 py-0.5 rounded text-xs">{r.plan}</span> : '—'}</td>
+                      <td className="px-3 py-2.5 mono font-medium text-xs">{formatCurrency(r.cableRent)}</td>
+
                       <td className="px-3 py-2.5 mono text-gray-900">{formatCurrency(r.amountBilled)}</td>
                       <td className="px-3 py-2.5 mono text-green-700">{formatCurrency(r.amountPaid)}</td>
                       <td className="px-3 py-2.5 mono font-medium"

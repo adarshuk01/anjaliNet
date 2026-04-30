@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, Legend } from 'recharts'
 import { MdPeople, MdCheckCircle, MdError, MdAccountBalance, MdTrendingUp, MdReceipt, MdRefresh } from 'react-icons/md'
 import api from '../utils/api'
@@ -173,7 +173,11 @@ export default function Dashboard() {
               ) : (
                 <div className="space-y-2">
                   {(summary?.recentPayments || []).slice(0, 6).map(p => (
-                    <div key={p._id} className="flex items-center gap-3 py-2 border-b border-gray-50 last:border-0">
+                    <Link
+  to={`/customers/${p.customerId?._id}`}
+  key={p._id}
+  className="flex items-center gap-3 py-2 border-b border-gray-50 last:border-0 cursor-pointer hover:bg-gray-50 rounded-lg px-1 transition-colors"
+>
                       <div className="w-8 h-8 rounded-full bg-brand-100 text-brand-700 flex items-center justify-center text-xs font-semibold flex-shrink-0">
                         {p.customerId?.name?.[0] || '?'}
                       </div>
@@ -185,7 +189,7 @@ export default function Dashboard() {
                         <p className="text-sm font-semibold text-gray-900">{formatCurrency(p.amountPaid)}</p>
                         <span className={`text-xs px-1.5 py-0.5 rounded font-medium ${getPaymentBadgeClass(p.paymentType)}`}>{p.paymentType}</span>
                       </div>
-                    </div>
+                    </Link>
                   ))}
                 </div>
               )}
@@ -202,8 +206,11 @@ export default function Dashboard() {
               ) : (
                 <div className="space-y-2">
                   {unpaid.slice(0, 6).map(r => (
-                    <div key={r._id} className="flex items-center gap-3 py-2 border-b border-gray-50 last:border-0">
-                      <div className="w-8 h-8 rounded-full bg-red-100 text-red-700 flex items-center justify-center text-xs font-semibold flex-shrink-0">
+<Link
+  to={`/customers/${r.customerId?._id}`}
+  key={r._id}
+  className="flex items-center gap-3 py-2 border-b border-gray-50 last:border-0 cursor-pointer hover:bg-gray-50 rounded-lg px-1 transition-colors"
+>                      <div className="w-8 h-8 rounded-full bg-red-100 text-red-700 flex items-center justify-center text-xs font-semibold flex-shrink-0">
                         {r.customerId?.name?.[0] || '?'}
                       </div>
                       <div className="flex-1 min-w-0">
@@ -211,7 +218,7 @@ export default function Dashboard() {
                         <p className="text-xs text-gray-400 mono">{r.customerId?.mobile}</p>
                       </div>
                       <span className="text-sm font-semibold text-red-600">{formatCurrency(r.balance)}</span>
-                    </div>
+                    </Link>
                   ))}
                 </div>
               )}

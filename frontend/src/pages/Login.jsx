@@ -30,12 +30,23 @@ export default function Login() {
     setSeeding(true)
     try {
       await api.post('/auth/seed')
-      setForm({ email: 'admin@anjalicomm.in', password: 'admin123' })
       setError('')
     } catch (err) {
       setError(err.response?.data?.message || 'Seed failed')
     } finally {
       setSeeding(false)
+    }
+  }
+
+  const handleDemo = async () => {
+    setError(''); setLoading(true)
+    try {
+      await login('demo@mail.com', '123456')
+      navigate('/')
+    } catch (err) {
+      setError('Demo login failed. Please try again.')
+    } finally {
+      setLoading(false)
     }
   }
 
@@ -91,7 +102,7 @@ export default function Login() {
               <label className="block text-sm font-medium text-gray-700 mb-1">Email address</label>
               <div className="relative">
                 <MdEmail className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
-                <input type="email" className="input pl-10" placeholder="admin@anjalicomm.in"
+                <input type="email" className="input pl-10" placeholder="your@email.com"
                   value={form.email} onChange={e => setForm(p => ({ ...p, email: e.target.value }))} required />
               </div>
             </div>
@@ -115,13 +126,24 @@ export default function Login() {
             </button>
           </form>
 
+          {/* Demo login */}
+          <button
+            type="button"
+            onClick={handleDemo}
+            disabled={loading}
+            className="mt-3 w-full py-2.5 flex items-center justify-center gap-2 bg-accent/10 hover:bg-accent/20 text-accent font-medium text-sm rounded-lg transition-colors disabled:opacity-50"
+          >
+            {loading
+              ? <div className="w-4 h-4 border-2 border-accent border-t-transparent rounded-full animate-spin" />
+              : '✦ Try Demo Account'}
+          </button>
+
           <div className="mt-6 pt-5 border-t border-gray-100">
             <p className="text-xs text-gray-400 text-center mb-3">First time setup? Create the admin account:</p>
             <button onClick={handleSeed} disabled={seeding}
               className="w-full text-center text-sm text-brand-700 hover:text-brand-900 font-medium py-2 border border-brand-200 rounded-lg hover:bg-brand-50 transition-colors disabled:opacity-50">
               {seeding ? 'Creating...' : 'Initialize Admin Account'}
             </button>
-            <p className="text-xs text-gray-400 text-center mt-2">Default: admin@anjalicomm.in / admin123</p>
           </div>
 
           <p className="text-xs text-gray-400 text-center mt-6">AnjaliNet v1.0.0 · Anjali Communications</p>
