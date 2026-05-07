@@ -212,17 +212,21 @@ export default function CustomerProfile() {
               <table className="w-full text-sm">
                 <thead className="bg-gray-50 border-b border-gray-200">
                   <tr>
-                    {['Month','Plan','Cable ','Billed','Paid','Balance','Pay Type','Bill No.','Status', ''].map(h => (
+                    {['Month','Bill Date','Paid Date','Plan','Cable ','Billed','Paid','Balance','Pay Type','Bill No.','Status', ''].map(h => (
                       <th key={h} className="px-3 py-2.5 text-left text-xs font-medium text-gray-500 uppercase whitespace-nowrap">{h}</th>
                     ))}
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-100">
                   {billing.length === 0 ? (
-                    <tr><td colSpan={9} className="py-10 text-center text-gray-400 text-sm">No billing records yet</td></tr>
+                    <tr><td colSpan={12} className="py-10 text-center text-gray-400 text-sm">No billing records yet</td></tr>
                   ) : billing.map(r => (
                     <tr key={r._id} className={getRowClass(r.balance, r.amountPaid)}>
                       <td className="px-3 py-2.5 mono font-medium text-xs">{r.month}</td>
+                      <td className="px-3 py-2.5 mono text-xs text-gray-600">{r.billingDate ? formatDate(r.billingDate) : '—'}</td>
+                      <td className="px-3 py-2.5 mono text-xs" style={{ color: r.paidDate ? '#15803d' : '#9CA3AF' }}>
+                        {r.paidDate ? formatDate(r.paidDate) : '—'}
+                      </td>
                       <td className="px-3 py-2.5 text-xs">{r.plan ? <span className="bg-blue-50 text-blue-700 px-1.5 py-0.5 rounded text-xs">{r.plan}</span> : '—'}</td>
                       <td className="px-3 py-2.5 mono font-medium text-xs">{formatCurrency(r.cableRent)}</td>
 

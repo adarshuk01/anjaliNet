@@ -155,7 +155,7 @@ export default function BillingForm({ initial, customerId, customerName, onSave,
           <MonthPicker value={form.month} onChange={v => set('month', v)} showNav={false} />
         </div>
         <div>
-          <label className="block text-xs font-medium text-gray-700 mb-1.5">Billing Date</label>
+          <label className="block text-xs font-medium text-gray-700 mb-1.5">Bill Generated Date</label>
           <input type="date" className="input" value={form.billingDate} onChange={e => set('billingDate', e.target.value)} />
         </div>
       </div>
@@ -214,7 +214,6 @@ export default function BillingForm({ initial, customerId, customerName, onSave,
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
           <label className="block text-xs font-medium text-gray-700 mb-1.5">Paid Date</label>
-          <input type="date" className="input" value={form.paidDate} onChange={e => set('paidDate', e.target.value)} />
         </div>
         <div>
           <label className="block text-xs font-medium text-gray-700 mb-1.5">Bill Number</label>

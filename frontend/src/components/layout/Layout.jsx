@@ -31,24 +31,7 @@ function LayoutInner() {
       {/* Mobile bottom nav bar */}
       <MobileBottomBar onClose={() => setSidebarOpen(false)} />
 
-      {/* Quick Pay FAB — above bottom bar on mobile */}
-      {isAgent && (
-        <button
-          onClick={() => openQuickPay()}
-          className="fixed bottom-20 right-4 lg:bottom-6 lg:right-6 z-40 flex items-center gap-2 bg-brand-800 hover:bg-brand-700 active:scale-95 text-white px-4 py-3 lg:px-5 lg:py-3.5 rounded-full shadow-lg text-sm font-semibold transition-all"
-        >
-          <MdPayments size={20} />
-          <span className="hidden sm:inline">Quick Pay</span>
-        </button>
-      )}
-
-      {isOpen && (
-        <QuickPay
-          initialCustomer={initialCustomer}
-          onClose={closeQuickPay}
-          onDone={closeQuickPay}
-        />
-      )}
+      
     </div>
   )
 }

@@ -23,12 +23,35 @@ export default function ImportModal({ mode, onClose, onDone }) {
 
   const excelDateToISO = (val) => {
     if (!val) return null
-    if (val instanceof Date) return val.toISOString().split('T')[0]
-    if (typeof val === 'number') {
-      const d = new Date(Math.round((val - 25569) * 86400 * 1000))
-      return d.toISOString().split('T')[0]
+    if (val instanceof Date) {
+      // xlsx.js with cellDates:true creates dates as UTC midnight (Date.UTC(y, m, d)).
+      // Always extract UTC date parts so the calendar date is preserved regardless
+      // of the browser/server timezone (fixes off-by-one in UTC- zones like Americas).
+      const y  = val.getUTCFullYear()
+      const m  = String(val.getUTCMonth() + 1).padStart(2, '0')
+      const d  = String(val.getUTCDate()).padStart(2, '0')
+      return `${y}-${m}-${d}`
     }
-    return String(val).trim() || null
+    if (typeof val === 'number') {
+      // Excel serial number — convert via UTC milliseconds
+      const d  = new Date(Math.round((val - 25569) * 86400 * 1000))
+      const y  = d.getUTCFullYear()
+      const mo = String(d.getUTCMonth() + 1).padStart(2, '0')
+      const dy = String(d.getUTCDate()).padStart(2, '0')
+      return `${y}-${mo}-${dy}`
+    }
+    // String value (e.g. "01 May 2026", "1-May-2026") — parse and re-format as YYYY-MM-DD
+    const str = String(val).trim()
+    if (!str) return null
+    const parsed = new Date(str)
+    if (!isNaN(parsed.getTime())) {
+      // new Date(string) parses in local time for most formats, use UTC parts for safety
+      const y  = parsed.getUTCFullYear()
+      const m  = String(parsed.getUTCMonth() + 1).padStart(2, '0')
+      const d  = String(parsed.getUTCDate()).padStart(2, '0')
+      return `${y}-${m}-${d}`
+    }
+    return str
   }
 
   const cleanMobile = (val) => {
@@ -128,17 +151,22 @@ export default function ImportModal({ mode, onClose, onDone }) {
         const payType = String(row['TYPE'] || row['PAYMENT TYPE'] || 'Cash').trim()
         const billNo  = row['BILL NO'] !== undefined ? String(row['BILL NO']).trim() : ''
 
-        const amountBilled = Number(row['AMOUNT'] || 0)
-        const cableRent    = Number(row['RENT'] || 0)
-        const oldBalance   = Number(row['OLD BAL'] || 0)
-        const amountPaid   = Number(row['PAID'] || 0)
-        const balance      = Number(row['BALANCE'] || 0)
+        // Guard against formula strings (e.g. "=IFERROR(...)") that cannot be coerced to a number
+        const safeNum = (v) => { const n = Number(v); return isFinite(n) ? n : 0 }
+
+        const amountBilled = safeNum(row['AMOUNT'])
+        const cableRent    = safeNum(row['RENT'])
+        const oldBalance   = safeNum(row['OLD BAL'])
+        const amountPaid   = safeNum(row['PAID'])
+        const balance      = safeNum(row['BALANCE'])
 
         const billingDate  = excelDateToISO(row['DATE'] || null)
         const paidDate     = excelDateToISO(row['PAID DATE'] || null)
 
-        if (!amountBilled && !amountPaid) {
-          warnings.push(`${sheet} row ${i + 2}: skipped — no amounts`)
+        // Only skip truly empty rows — a userId+plan with zero amounts is a valid zero-billed record
+        const plan = String(row['PLAN'] || '').trim()
+        if (!amountBilled && !amountPaid && !cableRent && !oldBalance && !plan && !billingDate) {
+          warnings.push(`${sheet} row ${i + 2}: skipped — empty row`)
           return
         }
 

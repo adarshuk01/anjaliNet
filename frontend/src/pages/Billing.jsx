@@ -242,7 +242,7 @@ export default function Billing() {
             <thead>
               <tr style={{ background: '#f9fafb' }}>
                 <th style={{ width: 4, minWidth: 4, padding: 0, borderBottom: '1px solid #e5e7eb' }} />
-                {['Date','Customer','Plan','Type','Cable','Billed','Old Bal','Paid','Balance','Bill No.','Status','Actions'].map(h => (
+                {['Bill Date','Paid Date','Customer','Plan','Type','Cable','Billed','Old Bal','Paid','Balance','Bill No.','Status','Actions'].map(h => (
                   <th key={h} className="px-3 py-2.5 text-left font-medium text-gray-500 uppercase tracking-wide whitespace-nowrap"
                     style={{ borderBottom: '1px solid #e5e7eb' }}>
                     {h}
@@ -254,13 +254,13 @@ export default function Billing() {
             <tbody>
               {loading ? (
                 <tr>
-                  <td colSpan={13} className="py-16 text-center">
+                  <td colSpan={14} className="py-16 text-center">
                     <div className="flex justify-center"><Spinner /></div>
                   </td>
                 </tr>
               ) : records.length === 0 ? (
                 <tr>
-                  <td colSpan={13}>
+                  <td colSpan={14}>
                     <EmptyState icon={MdReceiptLong} title="No billing records" description={`No records for ${month}`} />
                   </td>
                 </tr>
@@ -283,6 +283,10 @@ export default function Billing() {
                     <td style={{ ...accent, borderBottom: divider }} />
 
                     <td className="px-3 py-2 mono whitespace-nowrap" style={tdStyle}>{formatDate(r.billingDate)}</td>
+
+                    <td className="px-3 py-2 mono whitespace-nowrap" style={{ ...tdStyle, color: r.paidDate ? '#15803d' : '#9CA3AF' }}>
+                      {r.paidDate ? formatDate(r.paidDate) : '—'}
+                    </td>
 
                     <td className="px-3 py-2" style={tdStyle}>
                       <p className="font-medium text-gray-900 whitespace-nowrap">{r.customerId?.name || '—'}</p>
